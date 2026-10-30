@@ -21,3 +21,4 @@ export interface Order {
   paymentMethod: string;
   status: 'confirmed' | 'processing' | 'shipped' | 'delivered';
 }
+

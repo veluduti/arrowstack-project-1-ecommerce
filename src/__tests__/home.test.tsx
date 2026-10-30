@@ -29,3 +29,4 @@ describe('Home Page', () => {
     expect(screen.getByText(/upgrade your everyday essentials/i)).toBeInTheDocument();
   });
 });
+

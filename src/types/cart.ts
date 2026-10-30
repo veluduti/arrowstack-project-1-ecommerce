@@ -13,3 +13,4 @@ export interface CartSummaryData {
   discount: number;
   total: number;
 }
+

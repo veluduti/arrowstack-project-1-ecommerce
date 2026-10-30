@@ -95,3 +95,4 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
     </div>
   );
 };
+

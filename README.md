@@ -6,9 +6,10 @@
 ![React 18](https://img.shields.io/badge/React-18.3-cyan)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue)
 ![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-3.4-38bdf8)
-![Tests: Vitest](https://img.shields.io/badge/Tests-16%2F16%20Passing-emerald)
+![Tests: Vitest](https://img.shields.io/badge/Tests-27%2F27%20Passing-emerald)
+![A11y: WCAG 2.1 AA](https://img.shields.io/badge/Accessibility-WCAG%202.1%20AA-blue)
 
-ShopEase is a commercial-grade, accessible, and fully responsive e-commerce storefront built from the ground up for the **Arrowstack Frontend Development Internship**. The application enables users to discover curated products across multiple lifestyle categories, perform real-time multi-facet searching and filtering, inspect comprehensive product specifications, manage shopping cart quantities with strict stock boundary protection, and execute simulated checkout flows with client-side form validation.
+ShopEase is a commercial-grade, accessible, and fully responsive e-commerce storefront built from scratch for the **Arrowstack Frontend Development Internship**. The application enables users to discover curated products across multiple lifestyle categories, perform real-time multi-facet searching and filtering, inspect comprehensive product specifications, manage shopping cart quantities with strict stock boundary protection, and execute simulated checkout flows with client-side form validation.
 
 ---
 
@@ -22,20 +23,23 @@ ShopEase is a commercial-grade, accessible, and fully responsive e-commerce stor
   - Live navbar item counter badge.
   - Increment/decrement quantity controls with strict stock boundary clamping.
   - Automatic calculation of subtotal, tiered free delivery threshold (Free above ₹999), and final total.
-  - Resilient `localStorage` persistence with SSR hydration safeguards.
-  - Animated toast notifications on cart updates.
+  - Resilient `localStorage` persistence with SSR hydration safeguards and corrupted JSON recovery.
+  - Animated toast notifications on cart updates with screen reader live regions.
 - **Simulated Checkout with Zod Validation (`/checkout`)**:
   - Validated shipping address form powered by React Hook Form and Zod schemas.
   - Full Name, Email, 10-digit Indian Mobile, Street Address, City, State, and 6-digit PIN Code validation.
   - Double-click submission prevention and realistic processing feedback.
+  - Empty cart guard preventing orders without items.
 - **Order Success Page (`/order-success`)**:
   - Generates unique order identifier (e.g. `SE-XXXX-XXXX`).
   - Summarizes purchased products, total paid, and shipping recipient details.
   - Automatic cart cleanup after confirmed orders.
+  - One-click order ID copy button.
 - **Full State Handling**: Dedicated Loading Skeletons, Empty States (empty cart, no matching search/filters), Error States with retry mechanisms, and Success banners.
 - **Accessibility (a11y) First**:
   - Semantic HTML elements (`<header>`, `<main>`, `<nav>`, `<aside>`, `<article>`, `<footer>`).
   - Skip-to-main-content keyboard bypass link.
+  - Complete keyboard navigation with `Escape` dismiss for drawers and dialogs.
   - Explicit `aria-label`, `role`, `aria-checked`, and `aria-live` regions for toasts.
   - High-contrast visual focus rings for all interactive elements.
 
@@ -101,7 +105,7 @@ Before getting started, make sure you have:
 
 ## 🧪 Running Automated Tests
 
-ShopEase includes 16 comprehensive unit and integration test suites covering all critical user flows:
+ShopEase includes 27 comprehensive automated tests across 6 test suites covering core functionality and edge cases:
 
 ```bash
 # Run all tests once
@@ -111,12 +115,13 @@ npm test
 npm run test:watch
 ```
 
-### Test Suite Overview:
+### Test Suite Summary (27/27 Passing):
 - `home.test.tsx`: Hero banner, category highlights, featured products, and trust badges rendering.
 - `products.test.tsx`: Catalog rendering, real-time search, category filtering, price bounds, sorting, and empty states.
 - `product-detail.test.tsx`: Individual product rendering, specifications, stock checks, and cart integration.
 - `cart.test.tsx`: Cart actions, quantity updates, stock cap enforcement, totals calculation, and `localStorage` persistence.
 - `checkout.test.tsx`: Zod form validation, rejection of invalid inputs, and order ID generation.
+- `edge-cases.test.tsx`: Invalid product IDs, corrupted LocalStorage data, SecurityError handling, double-click order prevention, out-of-stock items, negative quantities, image load failure fallback, tiered shipping calculation, and refresh state restoration.
 
 ---
 
@@ -125,6 +130,19 @@ npm run test:watch
 ```
 ShopEase/
 ├── public/                     # Static assets and public images
+├── screenshots/                # Real screenshots captured from running app
+│   ├── 01-homepage.png
+│   ├── 02-products-listing.png
+│   ├── 03-product-details.png
+│   ├── 04-shopping-cart.png
+│   ├── 05-checkout.png
+│   ├── 06-order-success.png
+│   ├── 07-mobile-homepage.png
+│   ├── 08-mobile-products-page.png
+│   ├── 09-mobile-cart.png
+│   └── 10-mobile-checkout.png
+├── scripts/
+│   └── capture-screenshots.js  # Automated real screenshot capture tool
 ├── src/
 │   ├── app/                    # Next.js App Router pages
 │   │   ├── cart/               # /cart - Shopping cart page
@@ -145,11 +163,11 @@ ShopEase/
 │   ├── data/                   # products.ts (25+ sample products with images & specs)
 │   ├── lib/                    # Utilities: utils.ts, storage.ts, validation.ts
 │   ├── types/                  # TypeScript interfaces: product.ts, cart.ts, order.ts
-│   └── __tests__/              # Vitest & React Testing Library test suites
-├── screenshots/                # Application preview documentation
+│   └── __tests__/              # 6 Vitest test suites (27 automated tests)
 ├── DECISION-LOG.md             # Architecture & design decisions
 ├── IMPLEMENTATION.md           # Deep dive into components and logic
 ├── LIMITATIONS.md              # Current limitations & future enhancements
+├── PROJECT-1-SUBMISSION.md     # Final Internship submission summary report
 ├── REQUIREMENTS.md             # Project requirements and acceptance checklist
 ├── TESTING.md                  # Complete test cases, actual results, checklists
 ├── next.config.js              # Next.js image domain configuration
@@ -174,5 +192,10 @@ ShopEase/
 
 ---
 
-## ⚠️ Known Limitations
-See [LIMITATIONS.md](./LIMITATIONS.md) for full details on current limitations and roadmap improvements (e.g., mock backend API integration, user accounts, and real payment gateway webhooks).
+## 📦 Assumed Shipping Policy & Product Data
+
+- **Currency**: All prices are specified in Indian Rupees (₹).
+- **Free Delivery Policy**: Orders with subtotal **₹999 or higher** qualify for Free Express Shipping. Orders below ₹999 are charged a flat standard shipping fee of **₹99**. An empty cart has ₹0 shipping.
+- **Taxes**: All prices are inclusive of applicable GST.
+- **Simulated Reviews**: Product detail pages include simulated verified customer ratings, comments, and purchase timestamps.
+- **Simulated Checkout**: All payments are simulated in demo mode and persist to local storage without real financial charges.

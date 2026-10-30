@@ -34,11 +34,27 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isHydrated, setIsHydrated] = useState(false);
   const [toasts, setToasts] = useState<ToastInfo[]>([]);
 
-  // Hydrate cart from localStorage on mount (client-side only to prevent hydration mismatch)
+  // Hydrate cart from localStorage on mount with strict schema validation
   useEffect(() => {
-    const saved = getFromStorage<CartItem[]>(STORAGE_KEYS.CART, []);
-    if (Array.isArray(saved)) {
-      setItems(saved);
+    try {
+      const saved = getFromStorage<CartItem[]>(STORAGE_KEYS.CART, []);
+      if (Array.isArray(saved)) {
+        // Filter out corrupted, missing, or malformed entries
+        const validItems = saved.filter(
+          (item) =>
+            item &&
+            typeof item === 'object' &&
+            item.product &&
+            typeof item.product.id === 'string' &&
+            typeof item.product.price === 'number' &&
+            typeof item.quantity === 'number' &&
+            item.quantity > 0
+        );
+        setItems(validItems);
+      }
+    } catch (e) {
+      console.warn('Failed to hydrate cart from storage:', e);
+      setItems([]);
     }
     setIsHydrated(true);
   }, []);
@@ -66,12 +82,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addToCart = useCallback(
     (product: Product, quantity: number = 1): { success: boolean; message: string } => {
+      if (!product || !product.id) {
+        return { success: false, message: 'Invalid product' };
+      }
+
       if (product.stock <= 0) {
         showToast(`Sorry, "${product.name}" is currently out of stock.`, 'error');
         return { success: false, message: 'Product is out of stock' };
       }
 
-      let addedQty = quantity;
+      // Guard against invalid/negative quantity requests
+      const sanitizedQty = Math.max(1, Math.min(Math.floor(quantity), product.stock));
+      let addedQty = sanitizedQty;
       let finalMsg = '';
 
       setItems((prevItems) => {
@@ -86,12 +108,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return prevItems;
           }
 
-          const newQty = Math.min(currentQty + quantity, maxAvailable);
+          const newQty = Math.min(currentQty + sanitizedQty, maxAvailable);
           addedQty = newQty - currentQty;
 
-          finalMsg = addedQty < quantity
+          finalMsg = addedQty < sanitizedQty
             ? `Added ${addedQty} items. Maximum available stock reached.`
-            : `Added ${quantity} more "${product.name}" to cart.`;
+            : `Added ${sanitizedQty} more "${product.name}" to cart.`;
 
           const updated = [...prevItems];
           updated[existingIndex] = {
@@ -100,9 +122,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           };
           return updated;
         } else {
-          const safeQty = Math.min(quantity, product.stock);
           finalMsg = `Added "${product.name}" to your cart.`;
-          return [...prevItems, { product, quantity: safeQty }];
+          return [...prevItems, { product, quantity: sanitizedQty }];
         }
       });
 
@@ -125,13 +146,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const existing = prevItems.find((item) => item.product.id === productId);
         if (!existing) return prevItems;
 
-        if (quantity <= 0) {
-          // Remove from cart
+        if (isNaN(quantity) || quantity <= 0) {
+          // Remove from cart when quantity is 0, negative, or invalid
           showToast(`Removed "${existing.product.name}" from cart.`, 'info');
           return prevItems.filter((item) => item.product.id !== productId);
         }
 
-        if (quantity > existing.product.stock) {
+        const cleanQty = Math.floor(quantity);
+
+        if (cleanQty > existing.product.stock) {
           showToast(
             `Cannot add more than ${existing.product.stock} items (available stock).`,
             'warning'
@@ -147,7 +170,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         return prevItems.map((item) =>
-          item.product.id === productId ? { ...item, quantity } : item
+          item.product.id === productId ? { ...item, quantity: cleanQty } : item
         );
       });
 

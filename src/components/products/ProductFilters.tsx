@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CATEGORIES } from '@/data/products';
 import { SortOption } from '@/types/product';
 import { formatCurrency } from '@/lib/utils';
@@ -40,6 +40,29 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
   priceBounds,
 }) => {
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+
+  // Close mobile filter dialog on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isMobileFilterOpen) {
+        setIsMobileFilterOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isMobileFilterOpen]);
+
+  // Prevent background scroll when mobile filter is open
+  useEffect(() => {
+    if (isMobileFilterOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileFilterOpen]);
 
   const hasActiveFilters =
     Boolean(search) ||
@@ -176,6 +199,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
             type="button"
             onClick={() => setIsMobileFilterOpen(true)}
             className="md:hidden inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-500"
+            aria-expanded={isMobileFilterOpen}
+            aria-controls="mobile-filter-drawer"
             aria-label="Open filter sidebar"
           >
             <SlidersHorizontal className="w-4 h-4 text-slate-500" />
@@ -231,7 +256,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         )}
       </div>
 
-      {/* Desktop Sidebar Content rendered when container has sidebar */}
+      {/* Desktop Sidebar Content */}
       <div className="hidden md:block">
         {filterSidebarContent}
       </div>
@@ -240,6 +265,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
       {isMobileFilterOpen && (
         <div className="fixed inset-0 z-50 md:hidden bg-black/50 backdrop-blur-sm flex justify-end">
           <div
+            id="mobile-filter-drawer"
             role="dialog"
             aria-modal="true"
             aria-label="Filter products"
@@ -254,7 +280,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsMobileFilterOpen(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-600"
                   aria-label="Close filters"
                 >
                   <X className="w-5 h-5" />
@@ -268,7 +294,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
               <button
                 type="button"
                 onClick={() => setIsMobileFilterOpen(false)}
-                className="w-full py-3 bg-blue-600 text-white font-semibold text-sm rounded-xl shadow-md hover:bg-blue-700"
+                className="w-full py-3 bg-blue-600 text-white font-semibold text-sm rounded-xl shadow-md hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600"
               >
                 Apply Filters ({matchingCount} found)
               </button>

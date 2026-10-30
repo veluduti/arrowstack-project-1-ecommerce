@@ -108,3 +108,4 @@ describe('Shopping Cart and Persistence', () => {
     expect(result.current.summary.subtotal).toBe(4499 * 2);
   });
 });
+

@@ -38,3 +38,4 @@ export interface ProductFiltersState {
   maxPrice: number;
   sortBy: SortOption;
 }
+

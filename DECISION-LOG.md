@@ -64,3 +64,4 @@
   1. Server-side query parameter refetching
   2. Client-side state filtering with `useMemo` (Selected)
 - **Reasoning**: Since this is a simulated e-commerce frontend with a realistic sample dataset of 25+ items, client-side filtering via `useMemo` provides instantaneous sub-millisecond responsiveness as users type in the search bar or move the price sliders, delivering a superior user experience with zero server roundtrips.
+

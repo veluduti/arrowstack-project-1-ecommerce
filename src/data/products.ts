@@ -616,3 +616,4 @@ export const CATEGORY_METADATA = [
     itemCount: '5 Items',
   },
 ] as const;
+

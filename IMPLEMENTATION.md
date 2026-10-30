@@ -239,3 +239,4 @@ Direct access to `window.localStorage` in Next.js causes hydration mismatch warn
 - **Zero Heavy Runtime Libraries**: Clean native React state without Redux or external state engines.
 - **Next/Image Optimization**: High-resolution imagery configured with responsive `sizes` attributes for minimal mobile data usage.
 - **Offline Font Stack**: Utilizes modern system font fallback (`font-sans`), eliminating blocking third-party web font downloads.
+

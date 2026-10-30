@@ -11,7 +11,6 @@ import { saveToStorage, STORAGE_KEYS } from '@/lib/storage';
 import { Order } from '@/types/order';
 import {
   ShieldAlert,
-  CreditCard,
   Lock,
   CheckCircle,
   Truck,
@@ -44,6 +43,9 @@ export const CheckoutForm: React.FC = () => {
   });
 
   const onSubmit = async (data: CheckoutFormData) => {
+    // Ironclad guard against rapid duplicate double-clicks
+    if (isSubmitting) return;
+
     if (items.length === 0) {
       setSubmitError('Your cart is empty. Please add items before checking out.');
       return;
@@ -100,7 +102,7 @@ export const CheckoutForm: React.FC = () => {
         </div>
 
         {submitError && (
-          <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-center gap-2">
+          <div role="alert" className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
             <span>{submitError}</span>
           </div>
@@ -135,7 +137,7 @@ export const CheckoutForm: React.FC = () => {
                 }`}
               />
               {errors.fullName && (
-                <p id="fullName-error" className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
+                <p id="fullName-error" role="alert" className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
                   <AlertCircle className="w-3.5 h-3.5" />
                   {errors.fullName.message}
                 </p>
@@ -163,7 +165,7 @@ export const CheckoutForm: React.FC = () => {
                   }`}
                 />
                 {errors.email && (
-                  <p id="email-error" className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
+                  <p id="email-error" role="alert" className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" />
                     {errors.email.message}
                   </p>
@@ -189,7 +191,7 @@ export const CheckoutForm: React.FC = () => {
                   }`}
                 />
                 {errors.phone && (
-                  <p id="phone-error" className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
+                  <p id="phone-error" role="alert" className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" />
                     {errors.phone.message}
                   </p>
@@ -217,7 +219,7 @@ export const CheckoutForm: React.FC = () => {
                 }`}
               />
               {errors.address && (
-                <p id="address-error" className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
+                <p id="address-error" role="alert" className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
                   <AlertCircle className="w-3.5 h-3.5" />
                   {errors.address.message}
                 </p>
@@ -245,7 +247,7 @@ export const CheckoutForm: React.FC = () => {
                   }`}
                 />
                 {errors.city && (
-                  <p id="city-error" className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
+                  <p id="city-error" role="alert" className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" />
                     {errors.city.message}
                   </p>
@@ -271,7 +273,7 @@ export const CheckoutForm: React.FC = () => {
                   }`}
                 />
                 {errors.state && (
-                  <p id="state-error" className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
+                  <p id="state-error" role="alert" className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" />
                     {errors.state.message}
                   </p>
@@ -298,7 +300,7 @@ export const CheckoutForm: React.FC = () => {
                   }`}
                 />
                 {errors.postalCode && (
-                  <p id="postalCode-error" className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
+                  <p id="postalCode-error" role="alert" className="text-xs text-rose-600 mt-1 font-medium flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5" />
                     {errors.postalCode.message}
                   </p>

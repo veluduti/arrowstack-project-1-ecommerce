@@ -36,3 +36,4 @@
    - Provide interactive review submission forms with star rating pickers and photo upload capabilities.
 6. **Dark Mode Toggle**:
    - Add Tailwind dark mode class strategy (`dark:`) with system preference detection for night-time shoppers.
+

@@ -19,3 +19,4 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products, className = 
     </div>
   );
 };
+

@@ -52,3 +52,4 @@ export const checkoutFormSchema = z.object({
 });
 
 export type CheckoutFormData = z.infer<typeof checkoutFormSchema>;
+

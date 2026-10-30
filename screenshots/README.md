@@ -33,3 +33,4 @@ This directory holds visual references and previews of the ShopEase application 
 
 7. **`07-mobile-responsive.png`**:
    - Mobile view (375px) showing hamburger menu, mobile filter drawer, and stacked product cards.
+
